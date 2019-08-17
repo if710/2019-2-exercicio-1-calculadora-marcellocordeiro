@@ -77,7 +77,7 @@ class MainActivity : AppCompatActivity() {
             }
         } catch (e: RuntimeException) {
             text_info.text = "Error!"
-            Toast.makeText(applicationContext, e.toString(), Toast.LENGTH_LONG).show()
+            Toast.makeText(applicationContext, e.message, Toast.LENGTH_LONG).show()
         }
     }
 
