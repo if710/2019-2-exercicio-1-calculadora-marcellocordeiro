@@ -2,14 +2,84 @@ package br.ufpe.cin.android.calculadora
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Toast
+import kotlinx.android.synthetic.main.activity_main.*
+import kotlin.math.truncate
 
 class MainActivity : AppCompatActivity() {
+    private var expr = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        for (button in arrayListOf(
+            btn_0,
+            btn_1,
+            btn_2,
+            btn_3,
+            btn_4,
+            btn_5,
+            btn_6,
+            btn_7,
+            btn_8,
+            btn_9,
+            btn_Dot,
+            btn_Add,
+            btn_Subtract,
+            btn_Multiply,
+            btn_Divide,
+            btn_Power,
+            btn_LParen,
+            btn_RParen
+        )) {
+            button.setOnClickListener {
+                expr += button.text
+                updateField()
+            }
+        }
+
+        btn_Equal.setOnClickListener {
+            updateResult()
+        }
+
+        btn_Clear.setOnClickListener {
+            clearField()
+            clearResult()
+        }
     }
 
+    private fun clearField() {
+        expr = ""
+        text_calc.setText("")
+    }
+
+    private fun clearResult() {
+        text_info.text = ""
+    }
+
+    private fun updateField() {
+        text_calc.setText(expr)
+
+        if (text_info.text != "") {
+            clearResult()
+        }
+    }
+
+    private fun updateResult() {
+        try {
+            val result = eval(expr)
+
+            if (result == truncate(result)) {
+                text_info.text = result.toInt().toString()
+            } else {
+                text_info.text = result.toString()
+            }
+        } catch (e: RuntimeException) {
+            text_info.text = "Error!"
+            Toast.makeText(applicationContext, e.toString(), Toast.LENGTH_LONG).show()
+        }
+    }
 
     //Como usar a função:
     // eval("2+2") == 4.0
