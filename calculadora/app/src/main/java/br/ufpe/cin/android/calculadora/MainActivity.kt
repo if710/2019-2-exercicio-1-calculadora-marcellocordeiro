@@ -4,7 +4,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlin.math.truncate
+import kotlin.math.*
 
 class MainActivity : AppCompatActivity() {
     private var expr = ""
@@ -34,8 +34,10 @@ class MainActivity : AppCompatActivity() {
             btn_RParen
         )) {
             button.setOnClickListener {
-                expr += button.text
-                updateField()
+                if (expr.length < 15) {
+                    expr += button.text
+                    updateField()
+                }
             }
         }
 
@@ -46,6 +48,13 @@ class MainActivity : AppCompatActivity() {
         btn_Clear.setOnClickListener {
             clearField()
             clearResult()
+        }
+
+        btn_Backspace.setOnClickListener {
+            if (expr != "") {
+                expr = expr.substring(0, expr.length - 1)
+                updateField()
+            }
         }
     }
 
@@ -86,13 +95,13 @@ class MainActivity : AppCompatActivity() {
     // eval("2+3*4") = 14.0
     // eval("(2+3)*4") = 20.0
     //Fonte: https://stackoverflow.com/a/26227947
-    fun eval(str: String): Double {
+    private fun eval(str: String): Double {
         return object : Any() {
             var pos = -1
-            var ch: Char = ' '
+            var ch = ' '
             fun nextChar() {
                 val size = str.length
-                ch = if ((++pos < size)) str.get(pos) else (-1).toChar()
+                ch = if ((++pos < size)) str[pos] else (-1).toChar()
             }
 
             fun eat(charToEat: Char): Boolean {
@@ -107,7 +116,7 @@ class MainActivity : AppCompatActivity() {
             fun parse(): Double {
                 nextChar()
                 val x = parseExpression()
-                if (pos < str.length) throw RuntimeException("Caractere inesperado: " + ch)
+                if (pos < str.length) throw RuntimeException("Caractere inesperado: $ch")
                 return x
             }
 
@@ -119,24 +128,26 @@ class MainActivity : AppCompatActivity() {
             fun parseExpression(): Double {
                 var x = parseTerm()
                 while (true) {
-                    if (eat('+'))
-                        x += parseTerm() // adição
-                    else if (eat('-'))
-                        x -= parseTerm() // subtração
-                    else
-                        return x
+                    when {
+                        eat('+') -> x += parseTerm() // adição
+                        eat('-') -> x -= parseTerm() // subtração
+                        else -> return x
+                    }
                 }
             }
 
             fun parseTerm(): Double {
                 var x = parseFactor()
                 while (true) {
-                    if (eat('*'))
-                        x *= parseFactor() // multiplicação
-                    else if (eat('/'))
-                        x /= parseFactor() // divisão
-                    else
-                        return x
+                    when {
+                        eat('*') -> x *= parseFactor() // multiplicação
+                        eat('/') -> {
+                            val operand = parseFactor()
+                            if (operand == 0.0) throw RuntimeException("Erro: divisão por zero")
+                            x /= operand // divisão
+                        }
+                        else -> return x
+                    }
                 }
             }
 
@@ -155,20 +166,17 @@ class MainActivity : AppCompatActivity() {
                     while (ch in 'a'..'z') nextChar()
                     val func = str.substring(startPos, this.pos)
                     x = parseFactor()
-                    if (func == "sqrt")
-                        x = Math.sqrt(x)
-                    else if (func == "sin")
-                        x = Math.sin(Math.toRadians(x))
-                    else if (func == "cos")
-                        x = Math.cos(Math.toRadians(x))
-                    else if (func == "tan")
-                        x = Math.tan(Math.toRadians(x))
-                    else
-                        throw RuntimeException("Função desconhecida: " + func)
+                    x = when (func) {
+                        "sqrt" -> sqrt(x)
+                        "sin" -> sin(Math.toRadians(x))
+                        "cos" -> cos(Math.toRadians(x))
+                        "tan" -> tan(Math.toRadians(x))
+                        else -> throw RuntimeException("Função desconhecida: $func")
+                    }
                 } else {
-                    throw RuntimeException("Caractere inesperado: " + ch.toChar())
+                    throw RuntimeException("Caractere inesperado: $ch")
                 }
-                if (eat('^')) x = Math.pow(x, parseFactor()) // potência
+                if (eat('^')) x = x.pow(parseFactor()) // potência
                 return x
             }
         }.parse()
