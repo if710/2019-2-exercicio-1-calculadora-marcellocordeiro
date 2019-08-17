@@ -34,59 +34,60 @@ class MainActivity : AppCompatActivity() {
             btn_RParen
         )) {
             button.setOnClickListener {
-                if (expr.length < 15) {
-                    expr += button.text
-                    updateField()
+                if (expr.length < 15) { // Limits the size of the expression
+                    expr += button.text // Appends the character from the pressed button
+                    updateInputField() // Updates the input field
                 }
             }
         }
 
         btn_Equal.setOnClickListener {
-            updateResult()
+            updateResultField() // Updates the result field
         }
 
         btn_Clear.setOnClickListener {
-            clearField()
-            clearResult()
+            clearInputField() // Clears the input field
+            clearResultField() // Clears the result field
         }
 
         btn_Backspace.setOnClickListener {
-            if (expr != "") {
+            if (expr != "") { // Pops the last character out of the expression
                 expr = expr.substring(0, expr.length - 1)
-                updateField()
+                updateInputField()
             }
         }
     }
 
-    private fun clearField() {
-        expr = ""
-        text_calc.setText("")
+    private fun clearInputField() {
+        expr = "" // Clears expression
+        text_calc.setText("") // Clears input field
     }
 
-    private fun clearResult() {
-        text_info.text = ""
+    private fun clearResultField() {
+        text_info.text = "" // Clears result field
     }
 
-    private fun updateField() {
-        text_calc.setText(expr)
+    private fun updateInputField() {
+        text_calc.setText(expr) // Updates input field
 
+        // Clears the result field if the user is typing a new expression
         if (text_info.text != "") {
-            clearResult()
+            clearResultField()
         }
     }
 
-    private fun updateResult() {
+    private fun updateResultField() {
         try {
-            val result = eval(expr)
+            val result = eval(expr) // May throw if the expression is ill-formed
 
-            if (result == truncate(result)) {
-                text_info.text = result.toInt().toString()
+            if (result == truncate(result)) { // Checks if the result is an integer
+                text_info.text = result.toInt().toString() // Converts the result to an integer and update the result field
             } else {
-                text_info.text = result.toString()
+                text_info.text = result.toString() // Updates the result field
             }
-        } catch (e: RuntimeException) {
-            text_info.text = "Error!"
-            Toast.makeText(applicationContext, e.message, Toast.LENGTH_LONG).show()
+        } catch (e: RuntimeException) { // The expression is ill-formed
+            text_info.text = "Error!" // Shows "Error!" in the result field
+            Toast.makeText(applicationContext, e.message, Toast.LENGTH_LONG).show() // Shows the error in a toast
         }
     }
 
