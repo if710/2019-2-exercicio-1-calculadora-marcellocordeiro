@@ -7,32 +7,20 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlin.math.*
 
 class MainActivity : AppCompatActivity() {
-    private var expr = ""
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        for (button in arrayListOf(
-            btn_0,
-            btn_1,
-            btn_2,
-            btn_3,
-            btn_4,
-            btn_5,
-            btn_6,
-            btn_7,
-            btn_8,
-            btn_9,
-            btn_Dot,
-            btn_Add,
-            btn_Subtract,
-            btn_Multiply,
-            btn_Divide,
-            btn_Power,
-            btn_LParen,
-            btn_RParen
-        )) {
+        if (savedInstanceState != null) {
+            expr = savedInstanceState.getString("expr", "")
+            text_info.text = savedInstanceState.getString("result", "")
+            text_calc.setText(savedInstanceState.getString("input", ""))
+        }
+
+        for (button in arrayListOf(btn_0, btn_1, btn_2, btn_3, btn_4, btn_5, btn_6, btn_7, btn_8, btn_9,
+            btn_Dot, btn_Add, btn_Subtract, btn_Multiply, btn_Divide, btn_Power,
+            btn_LParen, btn_RParen))
+        {
             button.setOnClickListener {
                 if (expr.length < 15) { // Limits the size of the expression
                     expr += button.text // Appends the character from the pressed button
@@ -57,6 +45,16 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        outState.putString("expr", expr)
+        outState.putString("result", text_info.text.toString())
+        outState.putString("input", text_calc.text.toString())
+    }
+
+    private var expr = ""
 
     private fun clearInputField() {
         expr = "" // Clears expression
@@ -87,7 +85,7 @@ class MainActivity : AppCompatActivity() {
             }
         } catch (e: RuntimeException) { // The expression is ill-formed
             text_info.text = "Error!" // Shows "Error!" in the result field
-            Toast.makeText(applicationContext, e.message, Toast.LENGTH_LONG).show() // Shows the error in a toast
+            Toast.makeText(this, e.message, Toast.LENGTH_LONG).show() // Shows the error in a toast
         }
     }
 
