@@ -1,8 +1,8 @@
 package br.ufpe.cin.android.calculadora
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlin.math.*
 
@@ -17,10 +17,11 @@ class MainActivity : AppCompatActivity() {
             text_calc.setText(savedInstanceState.getString("input", ""))
         }
 
-        for (button in arrayListOf(btn_0, btn_1, btn_2, btn_3, btn_4, btn_5, btn_6, btn_7, btn_8, btn_9,
+        for (button in arrayListOf(
+            btn_0, btn_1, btn_2, btn_3, btn_4, btn_5, btn_6, btn_7, btn_8, btn_9,
             btn_Dot, btn_Add, btn_Subtract, btn_Multiply, btn_Divide, btn_Power,
-            btn_LParen, btn_RParen))
-        {
+            btn_LParen, btn_RParen
+        )) {
             button.setOnClickListener {
                 if (expr.length < 15) { // Limits the size of the expression
                     expr += button.text // Appends the character from the pressed button
@@ -79,7 +80,8 @@ class MainActivity : AppCompatActivity() {
             val result = eval(expr) // May throw if the expression is ill-formed
 
             if (result == truncate(result)) { // Checks if the result is an integer
-                text_info.text = result.toInt().toString() // Converts the result to an integer and update the result field
+                // Converts the result to an integer and update the result field
+                text_info.text = result.toInt().toString()
             } else {
                 text_info.text = result.toString() // Updates the result field
             }
